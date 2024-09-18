@@ -6,14 +6,14 @@ class Message {
   final String id;
   final String message;
   final String? imageUrl;
-  final DateTime createAt;
+  final DateTime createdAt;
   final bool isMine;
 
   const Message({
     required this.id,
     required this.message,
-    required this.imageUrl,
-    required this.createAt,
+    this.imageUrl,
+    required this.createdAt,
     required this.isMine,
   });
 
@@ -22,7 +22,7 @@ class Message {
       'id': id,
       'message': message,
       'imageUrl': imageUrl,
-      'createAt': createAt.millisecondsSinceEpoch,
+      'createAt': createdAt.millisecondsSinceEpoch,
       'isMine': isMine,
     };
   }
@@ -32,8 +32,24 @@ class Message {
       id: map['id'] as String,
       message: map['message'] as String,
       imageUrl: map['imageUrl'] != null ? map['imageUrl'] as String : null,
-      createAt: DateTime.fromMillisecondsSinceEpoch(map['createAt'] as int),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createAt'] as int),
       isMine: map['isMine'] as bool,
+    );
+  }
+
+  Message copyWith({
+    String? id,
+    String? message,
+    String? imageUrl,
+    DateTime? createdAt,
+    bool? isMine,
+  }) {
+    return Message(
+      id: id ?? this.id,
+      message: message ?? this.message,
+      imageUrl: imageUrl ?? this.imageUrl,
+      createdAt: createdAt ?? this.createdAt,
+      isMine: isMine ?? this.isMine,
     );
   }
 }
