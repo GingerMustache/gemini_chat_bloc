@@ -1,0 +1,4 @@
+base_locale: en
+input_file_pattern: .i18n.yaml
+fallback_strategy: base_locale
+input_directory: lib/common/localization/i18n
