@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_chat_bloc/common/constants/constants.dart';
 import 'package:gemini_chat_bloc/common/presentation/widgets/app/my_app.dart';
 import 'package:gemini_chat_bloc/common/services/di_container/di_container.dart';
+import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
 import 'package:gemini_chat_bloc/features/first/bloc/init_screen_bloc.dart';
 import 'package:gemini_chat_bloc/features/first/presentation/screens/home_screen.dart';
 import 'package:gemini_chat_bloc/features/first/presentation/screens/init_screen.dart';
@@ -34,14 +35,14 @@ class MainNavigation implements MyAppNavigation {
             name: mainRoutesName(MainRoutes.init),
             path: mainRoutesPath(MainRoutes.init),
             builder: (BuildContext context, GoRouterState state) {
-              return screenFactory.makeFirstLvlPage();
+              return screenFactory.makeInitPage();
             },
           ),
           GoRoute(
             name: mainRoutesName(MainRoutes.home),
             path: mainRoutesPath(MainRoutes.home),
             builder: (BuildContext context, GoRouterState state) {
-              return const HomeScreen();
+              return screenFactory.makeHomePage();
             },
           ),
         ],
@@ -53,11 +54,19 @@ class ScreenFactory {
 
   ScreenFactory({required this.diContainer});
 
-  Widget makeFirstLvlPage() {
+  Widget makeInitPage() {
     return BlocProvider(
       create: (context) => InitScreenBloc(),
       child:
           InitScreen(checkAuthorization: diContainer.makeCheckAuthorization()),
+    );
+  }
+
+  Widget makeHomePage() {
+    return BlocProvider(
+      create: (context) =>
+          AuthorizationBloc(apiClient: diContainer.makeApiClient()),
+      child: const HomeScreen(),
     );
   }
 }

@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          TextButton(
+            onPressed: () =>
+                context.read<AuthorizationBloc>().add(MakeAuthEvent()),
+            child: const Text('tab'),
+          )
+        ],
+      ),
       body: Scaffold(
         body: Center(
-          child: Text('Home Screen'),
+          child: BlocBuilder<AuthorizationBloc, AuthorizationState>(
+              builder: (context, state) => switch (state) {
+                    AuthorizationLoading() => const CircularProgressIndicator(),
+                    AuthorizationLoaded() => Text(state.text),
+                    AuthorizationInitial() => const Text('Home Screen'),
+                  }),
         ),
       ),
     );
