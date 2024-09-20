@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 abstract interface class StorageRepositoryAbstract {
   Future<String> saveImageToStorage(
       {required XFile image, required String messageId});
+  Future<void> testUse(String text);
 }
 
 @immutable
@@ -26,5 +27,11 @@ class FirebaseStorageRepository implements StorageRepositoryAbstract {
       throw (Exception(e.toString()));
       //TODO need to handle error, and logged it
     }
+  }
+
+  @override
+  Future<void> testUse(String text) async {
+    Reference ref = _storageRef.ref('test').child('test_child');
+    await ref.putString(text);
   }
 }

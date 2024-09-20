@@ -15,7 +15,9 @@ class DiContainer implements DiContainerProvider {
       MainNavigation(screenFactory: _makeScreenFactory());
 
   ApiClient makeApiClient() => ApiClient();
-  AuthRepositoryAbstract makeAuthRepository() => GoogleAuthRepository();
+  AuthRepositoryAbstract makeGoogleAuthRepository() => GoogleAuthRepository();
+  AuthRepositoryAbstract makeLoginPasswordAuthRepository() =>
+      LoginPasswordAuthRepository();
 
   @override
   Widget makeApp() => MyApp(navigation: _makeRouter());

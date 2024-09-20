@@ -2,12 +2,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart' show immutable;
+import 'package:gemini_chat_bloc/common/extensions/image_mim_type.dart';
+import 'package:gemini_chat_bloc/features/auth/data/models/message.dart';
+import 'package:gemini_chat_bloc/features/auth/repositories/storage_repository.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:gemini_chat_bloc/features/auth/data/models/message.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/storage_repository.dart';
+abstract interface class SendMessage {
+  Future sendMessage({
+    required String apiKey,
+    required String promptText,
+    required XFile? image,
+  });
+}
 
 @immutable
 class ChatRepository {
@@ -21,15 +29,13 @@ class ChatRepository {
 
   Future sendMessage({
     required String apiKey,
+    required XFile? image,
     required String promptText,
-    required XFile image,
   }) async {
-    final textModel = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
-      apiKey: apiKey,
-    );
+    // Define your model
+    final textModel = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
     final imageModel = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
+      model: 'gemini-pro-vision',
       apiKey: apiKey,
     );
 
@@ -87,6 +93,61 @@ class ChatRepository {
           ])
         ]);
       }
+
+      final responseText = response.text;
+
+      // Save the response in Firebase
+      final receivedMessageId = const Uuid().v4();
+
+      final responseMessage = Message(
+        id: receivedMessageId,
+        message: responseText!,
+        createdAt: DateTime.now(),
+        isMine: false,
+      );
+
+      // Save Message to Firebase
+      await _firestore
+          .collection('conversations')
+          .doc(userId)
+          .collection('messages')
+          .doc(receivedMessageId)
+          .set(responseMessage.toMap());
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  //! Send Text Only Prompt
+  Future sendTextMessage({
+    required String textPrompt,
+    required String apiKey,
+  }) async {
+    try {
+      // Define your model
+      final textModel = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+
+      final userId = _auth.currentUser!.uid;
+      final sentMessageId = const Uuid().v4();
+
+      Message message = Message(
+        id: sentMessageId,
+        message: textPrompt,
+        createdAt: DateTime.now(),
+        isMine: true,
+      );
+
+      // Save Message to Firebase
+      await _firestore
+          .collection('conversations')
+          .doc(userId)
+          .collection('messages')
+          .doc(sentMessageId)
+          .set(message.toMap());
+
+      // Make a text only request to Gemini API and save the response
+      final response =
+          await textModel.generateContent([Content.text(textPrompt)]);
 
       final responseText = response.text;
 

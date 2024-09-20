@@ -4,21 +4,24 @@ import 'package:gemini_chat_bloc/common/constants/constants.dart';
 import 'package:gemini_chat_bloc/common/presentation/widgets/app/my_app.dart';
 import 'package:gemini_chat_bloc/common/services/di_container/di_container.dart';
 import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
+import 'package:gemini_chat_bloc/features/auth/presentation/screens/auth_screen.dart';
 import 'package:gemini_chat_bloc/features/first/bloc/init_screen_bloc.dart';
 import 'package:gemini_chat_bloc/features/first/presentation/screens/home_screen.dart';
 import 'package:gemini_chat_bloc/features/first/presentation/screens/init_screen.dart';
 import 'package:go_router/go_router.dart';
 
-enum MainRoutes { home, init }
+enum MainRoutes { home, init, auth }
 
 String mainRoutesName(MainRoutes name) => switch (name) {
       MainRoutes.init => 'InitScreen',
+      MainRoutes.auth => 'AuthScreen',
       MainRoutes.home => 'HomeScreen',
     };
 
 String mainRoutesPath(MainRoutes name) => switch (name) {
       MainRoutes.init => '/',
-      MainRoutes.home => '/home',
+      MainRoutes.auth => '/auth_screen',
+      MainRoutes.home => '/home_screen',
     };
 
 class MainNavigation implements MyAppNavigation {
@@ -28,7 +31,7 @@ class MainNavigation implements MyAppNavigation {
 
   @override
   RouterConfig<RouteMatchList> router() => GoRouter(
-        initialLocation: mainRoutesPath(MainRoutes.home),
+        initialLocation: mainRoutesPath(MainRoutes.auth),
         navigatorKey: navigatorKey,
         routes: <RouteBase>[
           GoRoute(
@@ -39,10 +42,17 @@ class MainNavigation implements MyAppNavigation {
             },
           ),
           GoRoute(
+            name: mainRoutesName(MainRoutes.auth),
+            path: mainRoutesPath(MainRoutes.auth),
+            builder: (BuildContext context, GoRouterState state) {
+              return screenFactory.makeAuthPage();
+            },
+          ),
+          GoRoute(
             name: mainRoutesName(MainRoutes.home),
             path: mainRoutesPath(MainRoutes.home),
             builder: (BuildContext context, GoRouterState state) {
-              return screenFactory.makeHomePage();
+              return const HomeScreen();
             },
           ),
         ],
@@ -54,6 +64,16 @@ class ScreenFactory {
 
   ScreenFactory({required this.diContainer});
 
+  Widget makeAuthPage() {
+    return BlocProvider(
+      create: (context) => AuthorizationBloc(
+          googleAuthRepository: diContainer.makeGoogleAuthRepository(),
+          loginPasswordAuthRepository:
+              diContainer.makeLoginPasswordAuthRepository()),
+      child: const AuthScreen(),
+    );
+  }
+
   Widget makeInitPage() {
     return BlocProvider(
       create: (context) => InitScreenBloc(),
@@ -62,11 +82,11 @@ class ScreenFactory {
     );
   }
 
-  Widget makeHomePage() {
-    return BlocProvider(
-      create: (context) =>
-          AuthorizationBloc(apiClient: diContainer.makeApiClient()),
-      child: const HomeScreen(),
-    );
-  }
+  // Widget makeHomePage() {
+  //   return BlocProvider(
+  //     create: (context) =>
+  //         AuthorizationBloc(apiClient: diContainer.makeApiClient()),
+  //     child: const HomeScreen(),
+  //   );
+  // }
 }

@@ -11,9 +11,15 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         actions: [
           TextButton(
-            onPressed: () =>
-                context.read<AuthorizationBloc>().add(MakeAuthEvent()),
+            onPressed: () => context
+                .read<AuthorizationBloc>()
+                .add(TestStorageRepoEvent(text: "Test Storage")),
             child: const Text('tab'),
+          ),
+          TextButton(
+            onPressed: () =>
+                context.read<AuthorizationBloc>().add(MakeGoogleAuthEvent()),
+            child: const Text('auth'),
           )
         ],
       ),
