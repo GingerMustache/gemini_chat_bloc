@@ -69,7 +69,8 @@ class ScreenFactory {
       create: (context) => AuthorizationBloc(
           googleAuthRepository: diContainer.makeGoogleAuthRepository(),
           loginPasswordAuthRepository:
-              diContainer.makeLoginPasswordAuthRepository()),
+              diContainer.makeLoginPasswordAuthRepository(),
+          authProvider: diContainer.makeAuthProvider()),
       child: const AuthScreen(),
     );
   }

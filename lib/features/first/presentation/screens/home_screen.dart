@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
           TextButton(
             onPressed: () => context
                 .read<AuthorizationBloc>()
-                .add(TestStorageRepoEvent(text: "Test Storage")),
+                .add(ResendEmailVerificationEvent()),
             child: const Text('tab'),
           ),
           TextButton(

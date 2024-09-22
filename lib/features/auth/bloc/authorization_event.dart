@@ -26,10 +26,7 @@ class GotSignUpEvent extends AuthorizationEvent {
   List<Object?> get props => [];
 }
 
-class TestStorageRepoEvent extends AuthorizationEvent {
-  final String text;
-
-  TestStorageRepoEvent({required this.text});
+class ResendEmailVerificationEvent extends AuthorizationEvent {
   @override
   List<Object?> get props => [];
 }

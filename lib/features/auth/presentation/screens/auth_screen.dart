@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_chat_bloc/common/constants/constants.dart';
+import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -55,19 +57,43 @@ class _AuthScreenState extends State<AuthScreen> {
                   decoration: const InputDecoration(hintText: "Password")),
               Space.h40,
               TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'sign up',
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
+                onPressed: () {
+                  context
+                      .read<AuthorizationBloc>()
+                      .add(MakeLoginAndPasswordSignUpEvent(
+                        email: _email.text,
+                        password: _password.text,
+                      ));
+                },
+                child: BlocBuilder<AuthorizationBloc, AuthorizationState>(
+                  builder: (context, state) {
+                    if (state is AuthorizationLoading) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (state is AuthorizationLoaded) {
+                      return Text(state.text);
+                    }
+                    if (state is GotSignUpEvent) {
+                      return const Text('got it');
+                    }
+                    return const Text(
+                      'sign up',
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    );
+                  },
                 ),
               ),
               Space.h40,
               SizedBox(
                 height: 50,
                 child: TextButton(
-                  onPressed: () async {},
+                  onPressed: () => context.read<AuthorizationBloc>().add(
+                        ResendEmailVerificationEvent(),
+                      ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
