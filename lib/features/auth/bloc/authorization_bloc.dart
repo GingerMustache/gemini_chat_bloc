@@ -26,9 +26,13 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     on<MakeLoginAndPasswordSignUpEvent>(_onMakeLoginAndPasswordSignUpEvent);
     on<ResendEmailVerificationEvent>(_onResendEmailVerificationEvent);
 
+    // not work correct, need to test
+    // make refresh button to user, when he sign up, push refresh, user signIn event go with email and password
+    // and make sign in case in screen,
     _userSubscription = userStream.listen(
       (User? user) {
-        if (user!.emailVerified) {
+        user!.reload();
+        if (user.emailVerified) {
           add(GotSignUpEvent());
         }
       },
