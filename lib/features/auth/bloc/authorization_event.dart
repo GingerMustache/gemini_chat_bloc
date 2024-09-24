@@ -8,11 +8,11 @@ class MakeGoogleAuthEvent extends AuthorizationEvent {
   List<Object?> get props => [];
 }
 
-class MakeLoginAndPasswordSignUpEvent extends AuthorizationEvent {
+class EmailAndPasswordSignUpEvent extends AuthorizationEvent {
   final String email;
   final String password;
 
-  MakeLoginAndPasswordSignUpEvent({
+  EmailAndPasswordSignUpEvent({
     required this.email,
     required this.password,
   });
@@ -21,7 +21,7 @@ class MakeLoginAndPasswordSignUpEvent extends AuthorizationEvent {
   List<Object?> get props => [email, password];
 }
 
-class GotSignUpEvent extends AuthorizationEvent {
+class EmailVerificationSuccessEvent extends AuthorizationEvent {
   @override
   List<Object?> get props => [];
 }

@@ -14,7 +14,6 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   final AuthRepositoryAbstract googleAuthRepository;
   final AuthRepositoryAbstract loginPasswordAuthRepository;
   final AuthProvider authProvider;
-  final _firebaseAuth = FirebaseAuth.instance;
   late final StreamSubscription _userSubscription;
   late final Timer userRefresh;
 
@@ -23,40 +22,25 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     required this.loginPasswordAuthRepository,
     required this.authProvider,
   }) : super(AuthorizationInitial()) {
-    on<MakeGoogleAuthEvent>(_onMakeAuthEvent);
-    on<MakeLoginAndPasswordSignUpEvent>(_onMakeLoginAndPasswordSignUpEvent);
-    on<ResendEmailVerificationEvent>(_onResendEmailVerificationEvent);
-    on<GotSignUpEvent>(_onGotSignUpEvent);
+    on<EmailVerificationSuccessEvent>(_onEmailVerificationSuccessEvent);
+    on<EmailAndPasswordSignUpEvent>(_onEmailAndPasswordSignUpEvent);
 
     _userSubscription = userStream.listen(
       (User? user) {
         if (user != null && user.emailVerified) {
-          add(GotSignUpEvent());
+          add(EmailVerificationSuccessEvent());
           userRefresh.cancel();
         }
       },
     );
   }
 
-  void _onGotSignUpEvent(
-      GotSignUpEvent event, Emitter<AuthorizationState> emit) {
+  void _onEmailVerificationSuccessEvent(
+      EmailVerificationSuccessEvent event, Emitter<AuthorizationState> emit) {
     emit(GotSignUpState(text: 'got auth'));
   }
 
-  void _onMakeAuthEvent(
-      MakeGoogleAuthEvent event, Emitter<AuthorizationState> emit) async {
-    emit(AuthorizationLoading());
-    await Future.delayed(const Duration(seconds: 2));
-  }
-
-  void _onResendEmailVerificationEvent(ResendEmailVerificationEvent event,
-      Emitter<AuthorizationState> emit) async {
-    emit(AuthorizationLoading());
-    await authProvider.sendEmailVerification();
-    emit(AuthorizationLoaded(text: 'resend verification'));
-  }
-
-  void _onMakeLoginAndPasswordSignUpEvent(MakeLoginAndPasswordSignUpEvent event,
+  void _onEmailAndPasswordSignUpEvent(EmailAndPasswordSignUpEvent event,
       Emitter<AuthorizationState> emit) async {
     emit(AuthorizationLoading());
     await authProvider.createUser(
@@ -65,14 +49,16 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     );
 
     await authProvider.sendEmailVerification();
-    emit(AuthorizationLoaded(text: 'need to email verification '));
+    emit(AuthorizationLoaded(
+        text: "We've sent a verification code to your email."));
+
     userRefresh = Timer.periodic(
       const Duration(seconds: 7),
       (timer) => authProvider.currentUser?.userInstance?.reload(),
     );
   }
 
-  Stream<User?> get userStream => _firebaseAuth.userChanges();
+  Stream<User?> get userStream => FirebaseAuth.instance.userChanges();
 
   @override
   Future<void> close() async {

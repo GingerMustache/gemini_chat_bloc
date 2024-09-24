@@ -4,8 +4,6 @@ import 'package:gemini_chat_bloc/common/application/app_settings.dart';
 import 'package:gemini_chat_bloc/common/constants/constants.dart';
 import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
 
-enum _Field { email, password }
-
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
@@ -77,7 +75,7 @@ class Body extends StatelessWidget {
   final double padding;
 
   void signUp(BuildContext context) => context.read<AuthorizationBloc>().add(
-        MakeLoginAndPasswordSignUpEvent(
+        EmailAndPasswordSignUpEvent(
           email: _email.text,
           password: _password.text,
         ),
@@ -91,8 +89,8 @@ class Body extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _textField(field: _Field.email, controller: _email),
-          _textField(field: _Field.password, controller: _password),
+          _textField(isPassword: false, controller: _email),
+          _textField(isPassword: true, controller: _password),
           Space.h40,
           TextButton(
             onPressed: () => signUp(context),
@@ -150,23 +148,17 @@ class Body extends StatelessWidget {
   }
 
   TextField _textField({
-    required _Field field,
+    required bool isPassword,
     required TextEditingController controller,
   }) {
     return TextField(
         controller: controller,
-        keyboardType: switch (field) {
-          _Field.email => TextInputType.emailAddress,
-          _Field.password => null,
-        },
+        keyboardType: isPassword ? null : TextInputType.emailAddress,
         autocorrect: false,
         enableSuggestions: false,
-        obscureText: true,
+        obscureText: isPassword,
         decoration: InputDecoration(
-          hintText: switch (field) {
-            _Field.email => 'Email',
-            _Field.password => "Password",
-          },
+          hintText: isPassword ? "Password" : 'Email',
         ));
   }
 }
