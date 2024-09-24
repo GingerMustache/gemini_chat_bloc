@@ -30,6 +30,7 @@ class HomeScreen extends StatelessWidget {
                     AuthorizationLoading() => const CircularProgressIndicator(),
                     AuthorizationLoaded() => Text(state.text),
                     AuthorizationInitial() => const Text('Home Screen'),
+                    _ => const Text('data'),
                   }),
         ),
       ),

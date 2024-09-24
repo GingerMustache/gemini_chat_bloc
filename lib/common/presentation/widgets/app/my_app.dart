@@ -17,9 +17,9 @@ class MyApp extends StatelessWidget {
   final MyAppNavigation navigation;
 
   const MyApp({
-    Key? key,
+    super.key,
     required this.navigation,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

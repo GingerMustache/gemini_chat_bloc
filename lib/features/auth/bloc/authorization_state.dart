@@ -21,3 +21,12 @@ final class AuthorizationLoaded extends AuthorizationState {
   @override
   List<Object?> get props => [text];
 }
+
+final class GotSignUpState extends AuthorizationState {
+  final String text;
+
+  GotSignUpState({required this.text});
+
+  @override
+  List<Object?> get props => [text];
+}

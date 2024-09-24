@@ -16,6 +16,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   final AuthProvider authProvider;
   final _firebaseAuth = FirebaseAuth.instance;
   late final StreamSubscription _userSubscription;
+  late final Timer userRefresh;
 
   AuthorizationBloc({
     required this.googleAuthRepository,
@@ -25,18 +26,21 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     on<MakeGoogleAuthEvent>(_onMakeAuthEvent);
     on<MakeLoginAndPasswordSignUpEvent>(_onMakeLoginAndPasswordSignUpEvent);
     on<ResendEmailVerificationEvent>(_onResendEmailVerificationEvent);
+    on<GotSignUpEvent>(_onGotSignUpEvent);
 
-    // not work correct, need to test
-    // make refresh button to user, when he sign up, push refresh, user signIn event go with email and password
-    // and make sign in case in screen,
     _userSubscription = userStream.listen(
       (User? user) {
-        user!.reload();
-        if (user.emailVerified) {
+        if (user != null && user.emailVerified) {
           add(GotSignUpEvent());
+          userRefresh.cancel();
         }
       },
     );
+  }
+
+  void _onGotSignUpEvent(
+      GotSignUpEvent event, Emitter<AuthorizationState> emit) {
+    emit(GotSignUpState(text: 'got auth'));
   }
 
   void _onMakeAuthEvent(
@@ -55,15 +59,20 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   void _onMakeLoginAndPasswordSignUpEvent(MakeLoginAndPasswordSignUpEvent event,
       Emitter<AuthorizationState> emit) async {
     emit(AuthorizationLoading());
-    await authProvider.createUser(email: event.email, password: event.password);
-    authProvider.currentUser;
+    await authProvider.createUser(
+      email: event.email,
+      password: event.password,
+    );
 
     await authProvider.sendEmailVerification();
-
-    emit(AuthorizationLoaded(text: "The user is SignUp"));
+    emit(AuthorizationLoaded(text: 'need to email verification '));
+    userRefresh = Timer.periodic(
+      const Duration(seconds: 7),
+      (timer) => authProvider.currentUser?.userInstance?.reload(),
+    );
   }
 
-  Stream<User?> get userStream => _firebaseAuth.authStateChanges();
+  Stream<User?> get userStream => _firebaseAuth.userChanges();
 
   @override
   Future<void> close() async {

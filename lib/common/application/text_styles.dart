@@ -39,7 +39,7 @@ final headlineSmall = _getTextStyleFromThema(
 
 final titleLarge = _getTextStyleFromThema(
   fontSize: 18.0,
-  fontWeight: FontWeight.bold,
+  color: AppColors.mainGrey,
 );
 
 final titleMedium = _getTextStyleFromThema(
@@ -49,6 +49,7 @@ final titleMedium = _getTextStyleFromThema(
 
 final titleSmall = _getTextStyleFromThema(
   fontSize: 14.0,
+  color: AppColors.mainGrey,
 );
 
 final bodyLarge = _getTextStyleFromThema(
