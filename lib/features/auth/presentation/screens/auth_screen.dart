@@ -1,4 +1,6 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_chat_bloc/common/application/app_settings.dart';
 import 'package:gemini_chat_bloc/common/constants/constants.dart';
@@ -89,8 +91,10 @@ class Body extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _textField(isPassword: false, controller: _email),
-          _textField(isPassword: true, controller: _password),
+          // _textField(isPassword: false, controller: _email),
+          // _textField(isPassword: true, controller: _password),
+          InputField(controller: _email, isPassword: false),
+          InputField(controller: _password, isPassword: true),
           Space.h40,
           TextButton(
             onPressed: () => signUp(context),
@@ -160,5 +164,40 @@ class Body extends StatelessWidget {
         decoration: InputDecoration(
           hintText: isPassword ? "Password" : 'Email',
         ));
+  }
+}
+
+class InputField extends StatelessWidget {
+  final TextEditingController controller;
+  final bool isPassword;
+
+  const InputField({
+    super.key,
+    required this.controller,
+    required this.isPassword,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        key: const Key('email_input_key'),
+        controller: controller,
+        enableSuggestions: isPassword ? false : true,
+        obscureText: isPassword ? true : false,
+        decoration: InputDecoration(
+          hintText: isPassword ? "Password" : 'Email',
+        ),
+        validator: (value) => isPassword ? null : _validateEmail(value),
+        inputFormatters: [FilteringTextInputFormatter.deny(' ')],
+        onChanged: (value) => value.replaceAll(' ', '').toLowerCase());
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty || value.contains(' ')) {
+      return 'email must not be empty';
+    } else if (!EmailValidator.validate(value)) {
+      return 'wrong email format';
+    }
+    return null;
   }
 }
