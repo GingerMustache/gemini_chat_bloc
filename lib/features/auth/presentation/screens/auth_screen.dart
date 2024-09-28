@@ -41,16 +41,19 @@ class _AuthScreenState extends State<AuthScreen> {
           builder: (context, constraints) {
             return switch (constraints.maxWidth) {
               final maxWidth when maxWidth < 600 => Body(
+                  formKey: formKey,
                   email: _email,
                   password: _password,
                   padding: 70,
                 ),
               final maxWidth when maxWidth < 1200 => Body(
+                  formKey: formKey,
                   email: _email,
                   password: _password,
                   padding: 250,
                 ),
               _ => Body(
+                  formKey: formKey,
                   email: _email,
                   password: _password,
                   padding: 400,
@@ -64,24 +67,29 @@ class _AuthScreenState extends State<AuthScreen> {
 }
 
 class Body extends StatelessWidget {
-  const Body(
-      {super.key,
-      required TextEditingController email,
-      required TextEditingController password,
-      required this.padding})
-      : _email = email,
-        _password = password;
+  const Body({
+    super.key,
+    required TextEditingController email,
+    required GlobalKey<FormState> formKey,
+    required TextEditingController password,
+    required this.padding,
+  })  : _email = email,
+        _password = password,
+        _formKey = formKey;
 
   final TextEditingController _email;
   final TextEditingController _password;
+  final GlobalKey<FormState> _formKey;
   final double padding;
 
-  void signUp(BuildContext context) => context.read<AuthorizationBloc>().add(
-        EmailAndPasswordSignUpEvent(
-          email: _email.text,
-          password: _password.text,
-        ),
-      );
+  void signUp(BuildContext context) => _formKey.currentState!.validate()
+      ? context.read<AuthorizationBloc>().add(
+            EmailAndPasswordSignUpEvent(
+              email: _email.text,
+              password: _password.text,
+            ),
+          )
+      : {};
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +99,8 @@ class Body extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // _textField(isPassword: false, controller: _email),
-          // _textField(isPassword: true, controller: _password),
-          InputField(controller: _email, isPassword: false),
-          InputField(controller: _password, isPassword: true),
+          AuthInputField(controller: _email, isPassword: false),
+          AuthInputField(controller: _password, isPassword: true),
           Space.h40,
           TextButton(
             onPressed: () => signUp(context),
@@ -150,28 +156,13 @@ class Body extends StatelessWidget {
       ),
     );
   }
-
-  TextField _textField({
-    required bool isPassword,
-    required TextEditingController controller,
-  }) {
-    return TextField(
-        controller: controller,
-        keyboardType: isPassword ? null : TextInputType.emailAddress,
-        autocorrect: false,
-        enableSuggestions: false,
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          hintText: isPassword ? "Password" : 'Email',
-        ));
-  }
 }
 
-class InputField extends StatelessWidget {
+class AuthInputField extends StatelessWidget {
   final TextEditingController controller;
   final bool isPassword;
 
-  const InputField({
+  const AuthInputField({
     super.key,
     required this.controller,
     required this.isPassword,
@@ -180,7 +171,6 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        key: const Key('email_input_key'),
         controller: controller,
         enableSuggestions: isPassword ? false : true,
         obscureText: isPassword ? true : false,
@@ -194,7 +184,7 @@ class InputField extends StatelessWidget {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty || value.contains(' ')) {
-      return 'email must not be empty';
+      return 'field must not be empty';
     } else if (!EmailValidator.validate(value)) {
       return 'wrong email format';
     }
