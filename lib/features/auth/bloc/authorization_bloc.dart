@@ -28,6 +28,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     on<EmailAndPasswordSignUpEvent>(_onEmailAndPasswordSignUpEvent);
     on<MakeGoogleAuthEvent>(_onMakeGoogleAuthEvent);
 
+    _firebaseAuthService.currentUser?.userInstance?.reload();
     _userSubscription = userStream.listen(
       (User? user) {
         if (user != null && user.emailVerified) {
@@ -87,6 +88,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   @override
   Future<void> close() async {
     _userSubscription.cancel();
+
     super.close();
   }
 }

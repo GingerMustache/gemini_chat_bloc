@@ -6,6 +6,8 @@ import 'package:gemini_chat_bloc/common/application/app_settings.dart';
 import 'package:gemini_chat_bloc/common/constants/constants.dart';
 import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
 
+part '../parts/auth_input_field.dart';
+
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
@@ -154,39 +156,5 @@ class Body extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class AuthInputField extends StatelessWidget {
-  final TextEditingController controller;
-  final bool isPassword;
-
-  const AuthInputField({
-    super.key,
-    required this.controller,
-    required this.isPassword,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-        controller: controller,
-        enableSuggestions: isPassword ? false : true,
-        obscureText: isPassword ? true : false,
-        decoration: InputDecoration(
-          hintText: isPassword ? "Password" : 'Email',
-        ),
-        validator: (value) => isPassword ? null : _validateEmail(value),
-        inputFormatters: [FilteringTextInputFormatter.deny(' ')],
-        onChanged: (value) => value.replaceAll(' ', '').toLowerCase());
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty || value.contains(' ')) {
-      return 'field must not be empty';
-    } else if (!EmailValidator.validate(value)) {
-      return 'wrong email format';
-    }
-    return null;
   }
 }
