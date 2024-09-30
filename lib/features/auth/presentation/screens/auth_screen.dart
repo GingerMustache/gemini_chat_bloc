@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_chat_bloc/common/application/app_settings.dart';
 import 'package:gemini_chat_bloc/common/constants/constants.dart';
+import 'package:gemini_chat_bloc/common/routing/routes.dart';
 import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 part '../parts/auth_input_field.dart';
 
@@ -114,10 +116,15 @@ class Body extends StatelessWidget {
                   );
                 }
                 if (state is AuthorizationLoaded) {
-                  return Text(state.text);
+                  context.goNamed(mainRoutesName(MainRoutes.home));
+                  // return Text(state.text);
                 }
                 if (state is GotSignUpState) {
-                  return Text(state.text);
+                  //TODO need to make it better
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    context.goNamed(mainRoutesName(MainRoutes.home));
+                  });
+                  // return Text(state.text);
                 }
                 return Text(
                   'sign up',
