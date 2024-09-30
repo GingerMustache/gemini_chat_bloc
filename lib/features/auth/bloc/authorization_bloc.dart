@@ -4,27 +4,29 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User, FirebaseAuth;
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_exceptions.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_provider.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/auth_repository.dart';
+import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_service.dart';
 import 'package:meta/meta.dart';
 
 part 'authorization_event.dart';
 part 'authorization_state.dart';
 
 class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
-  final AuthRepositoryAbstract googleAuthRepository;
-  final AuthRepositoryAbstract loginPasswordAuthRepository;
-  final AuthProvider authProvider;
+  final AuthService _googleAuthService;
+  final AuthService _firebaseAuthService;
   late final StreamSubscription _userSubscription;
   late final Timer userRefresh;
 
   AuthorizationBloc({
-    required this.googleAuthRepository,
-    required this.loginPasswordAuthRepository,
-    required this.authProvider,
-  }) : super(AuthorizationInitial()) {
+    required AuthService googleAuthService,
+    required AuthService firebaseAuthService,
+  })  : _googleAuthService = googleAuthService,
+        _firebaseAuthService = firebaseAuthService,
+        super(
+          AuthorizationInitial(),
+        ) {
     on<EmailVerificationSuccessEvent>(_onEmailVerificationSuccessEvent);
     on<EmailAndPasswordSignUpEvent>(_onEmailAndPasswordSignUpEvent);
+    on<MakeGoogleAuthEvent>(_onMakeGoogleAuthEvent);
 
     _userSubscription = userStream.listen(
       (User? user) {
@@ -34,6 +36,19 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
         }
       },
     );
+  }
+
+  void _onMakeGoogleAuthEvent(
+    MakeGoogleAuthEvent event,
+    Emitter<AuthorizationState> emit,
+  ) async {
+    try {
+      emit(AuthorizationLoading());
+      await _googleAuthService.logIn(email: '', password: 'password');
+      emit(AuthorizationLoaded(text: 'google auth is done'));
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   void _onEmailVerificationSuccessEvent(
@@ -46,17 +61,17 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     emit(AuthorizationLoading());
 
     try {
-      await authProvider.createUser(
+      await _firebaseAuthService.createUser(
         email: event.email,
         password: event.password,
       );
-      await authProvider.sendEmailVerification();
+      await _firebaseAuthService.sendEmailVerification();
       emit(AuthorizationLoaded(
           text: "We've sent a verification code to your email."));
 
       userRefresh = Timer.periodic(
         const Duration(seconds: 7),
-        (timer) => authProvider.currentUser?.userInstance?.reload(),
+        (timer) => _firebaseAuthService.currentUser?.userInstance?.reload(),
       );
     } on EmailAlreadyInUseAuthExceptions catch (e) {
       print(e.toString());

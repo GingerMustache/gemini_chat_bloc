@@ -135,9 +135,8 @@ class Body extends StatelessWidget {
     return SizedBox(
       height: 50,
       child: TextButton(
-        onPressed: () => context.read<AuthorizationBloc>().add(
-              ResendEmailVerificationEvent(),
-            ),
+        onPressed: () =>
+            context.read<AuthorizationBloc>().add(MakeGoogleAuthEvent()),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

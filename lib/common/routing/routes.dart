@@ -67,10 +67,8 @@ class ScreenFactory {
   Widget makeAuthPage() {
     return BlocProvider(
       create: (context) => AuthorizationBloc(
-          googleAuthRepository: diContainer.makeGoogleAuthRepository(),
-          loginPasswordAuthRepository:
-              diContainer.makeLoginPasswordAuthRepository(),
-          authProvider: diContainer.makeAuthProvider()),
+          googleAuthService: diContainer.makeGoogleAuthService(),
+          firebaseAuthService: diContainer.makeFirebaseAuthService()),
       child: const AuthScreen(),
     );
   }
