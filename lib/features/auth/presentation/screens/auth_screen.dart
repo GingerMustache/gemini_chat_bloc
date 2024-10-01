@@ -125,6 +125,21 @@ class Body extends StatelessWidget {
                 if (state is GotSignUpState) {
                   return Text(state.text);
                 }
+                if (state is ErrorState) {
+                  return Column(
+                    children: [
+                      Text(
+                        state.text,
+                        style: errorStyle,
+                      ),
+                      Space.h10,
+                      Text(
+                        'sign up',
+                        style: titleSmall,
+                      ),
+                    ],
+                  );
+                }
                 return Text(
                   'sign up',
                   style: titleSmall,

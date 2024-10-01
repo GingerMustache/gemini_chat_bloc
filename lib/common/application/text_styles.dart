@@ -52,6 +52,11 @@ final titleSmall = _getTextStyleFromThema(
   color: AppColors.mainGrey,
 );
 
+final errorStyle = _getTextStyleFromThema(
+  fontSize: 14.0,
+  color: AppColors.mainRed,
+);
+
 final bodyLarge = _getTextStyleFromThema(
   fontSize: 16.0,
   fontWeight: FontWeight.normal,

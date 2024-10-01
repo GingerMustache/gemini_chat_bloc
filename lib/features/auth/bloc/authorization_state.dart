@@ -30,3 +30,12 @@ final class GotSignUpState extends AuthorizationState {
   @override
   List<Object?> get props => [text];
 }
+
+final class ErrorState extends AuthorizationState {
+  final String text;
+
+  ErrorState({required this.text});
+
+  @override
+  List<Object?> get props => [text];
+}

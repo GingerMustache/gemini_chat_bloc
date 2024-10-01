@@ -75,11 +75,15 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
         (timer) => _firebaseAuthService.currentUser?.userInstance?.reload(),
       );
     } on EmailAlreadyInUseAuthExceptions catch (e) {
-      print(e.toString());
+      //TODO errors need to add to logger or add to analitics
+      emit(ErrorState(text: 'email already in use'));
     } on InvalidEmailAuthExceptions catch (e) {
-      print(e.toString());
+      emit(ErrorState(text: 'invalid email'));
+    } on WeakPasswordAuthExceptions catch (e) {
+      emit(ErrorState(text: 'weak password'));
     } on GenericAuthExceptions catch (e) {
-      print(e.toString());
+      emit(ErrorState(
+          text: 'something went wrong, try later, or do your job body'));
     }
   }
 
