@@ -14,6 +14,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   final AuthService _googleAuthService;
   final AuthService _firebaseAuthService;
   late final StreamSubscription _userSubscription;
+
   Timer? userRefresh;
 
   AuthorizationBloc({

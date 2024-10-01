@@ -5,33 +5,26 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gemini_chat_bloc/common/application/bloc_observer.dart';
+import 'package:gemini_chat_bloc/common/constants/constants.dart';
 // need to run dart run build_runner build
 import 'package:gemini_chat_bloc/common/localization/i18n/strings.g.dart';
 import 'package:gemini_chat_bloc/common/services/di_container/di_container.dart';
 
 import 'firebase_options.dart';
 
-class BlocObservers extends BlocObserver {
-  @override
-  void onCreate(BlocBase bloc) {
-    super.onCreate(bloc);
-    print(bloc);
-  }
-}
-
 void main() async {
-  runZonedGuarded(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
-      await initApp();
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await initApp();
 
-      final DiContainerProvider diContainer = DiContainer();
-      final app = diContainer.makeApp();
+    final DiContainerProvider diContainer = DiContainer();
+    final app = diContainer.makeApp();
 
-      runApp(TranslationProvider(child: app));
-    },
-    (error, stack) {},
-  );
+    runApp(TranslationProvider(child: app));
+  }, (Object error, StackTrace stack) {
+    talker.handle(error, stack, 'Uncaught app exception');
+  });
 }
 
 Future<void> initApp() async {
@@ -42,5 +35,6 @@ Future<void> initApp() async {
     androidProvider: AndroidProvider.debug,
   );
   await dotenv.load(fileName: '.env');
-  Bloc.observer = BlocObservers();
+
+  Bloc.observer = const AppBlocObserver();
 }
