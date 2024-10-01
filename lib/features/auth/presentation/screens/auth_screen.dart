@@ -108,23 +108,22 @@ class Body extends StatelessWidget {
           Space.h40,
           TextButton(
             onPressed: () => signUp(context),
-            child: BlocBuilder<AuthorizationBloc, AuthorizationState>(
+            child: BlocConsumer<AuthorizationBloc, AuthorizationState>(
+              listenWhen: (previous, current) => current is GotSignUpState,
+              listener: (context, state) {
+                context.goNamed(mainRoutesName(MainRoutes.home));
+              },
               builder: (context, state) {
                 if (state is AuthorizationLoading) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
-                if (state is AuthorizationLoaded) {
-                  context.goNamed(mainRoutesName(MainRoutes.home));
-                  // return Text(state.text);
+                if (state is SendEmailVerificationState) {
+                  return Text(state.text);
                 }
                 if (state is GotSignUpState) {
-                  //TODO need to make it better
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    context.goNamed(mainRoutesName(MainRoutes.home));
-                  });
-                  // return Text(state.text);
+                  return Text(state.text);
                 }
                 return Text(
                   'sign up',

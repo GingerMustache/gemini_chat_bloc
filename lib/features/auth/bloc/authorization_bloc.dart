@@ -14,7 +14,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   final AuthService _googleAuthService;
   final AuthService _firebaseAuthService;
   late final StreamSubscription _userSubscription;
-  late final Timer userRefresh;
+  Timer? userRefresh;
 
   AuthorizationBloc({
     required AuthService googleAuthService,
@@ -33,7 +33,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
       (User? user) {
         if (user != null && user.emailVerified) {
           add(EmailVerificationSuccessEvent());
-          userRefresh.cancel();
+          userRefresh?.cancel();
         }
       },
     );
@@ -46,7 +46,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     try {
       emit(AuthorizationLoading());
       await _googleAuthService.logIn(email: '', password: 'password');
-      emit(AuthorizationLoaded(text: 'google auth is done'));
+      emit(GotSignUpState(text: 'google auth is done'));
     } catch (e) {
       print(e.toString());
     }
@@ -67,7 +67,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
         password: event.password,
       );
       await _firebaseAuthService.sendEmailVerification();
-      emit(AuthorizationLoaded(
+      emit(SendEmailVerificationState(
           text: "We've sent a verification code to your email."));
 
       userRefresh = Timer.periodic(
@@ -88,7 +88,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   @override
   Future<void> close() async {
     _userSubscription.cancel();
-
+    userRefresh?.cancel();
     super.close();
   }
 }

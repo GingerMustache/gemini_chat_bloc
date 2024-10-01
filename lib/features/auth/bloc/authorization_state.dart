@@ -13,10 +13,10 @@ final class AuthorizationLoading extends AuthorizationState {
   List<Object?> get props => [];
 }
 
-final class AuthorizationLoaded extends AuthorizationState {
+final class SendEmailVerificationState extends AuthorizationState {
   final String text;
 
-  AuthorizationLoaded({required this.text});
+  SendEmailVerificationState({required this.text});
 
   @override
   List<Object?> get props => [text];

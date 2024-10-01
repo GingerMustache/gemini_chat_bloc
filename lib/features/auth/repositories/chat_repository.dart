@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart' show immutable;
@@ -27,15 +29,21 @@ class ChatRepository {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
 
+  final StreamController<Message> messagesListController =
+      StreamController<Message>();
+
   Future sendMessage({
     required String apiKey,
     required XFile? image,
     required String promptText,
   }) async {
     // Define your model
-    final textModel = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+    final textModel = GenerativeModel(
+      model: 'gemini-1.5-flash-latest',
+      apiKey: apiKey,
+    );
     final imageModel = GenerativeModel(
-      model: 'gemini-pro-vision',
+      model: 'gemini-1.5-flash-latest',
       apiKey: apiKey,
     );
 
@@ -125,7 +133,8 @@ class ChatRepository {
   }) async {
     try {
       // Define your model
-      final textModel = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+      final textModel =
+          GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
 
       final userId = _auth.currentUser!.uid;
       final sentMessageId = const Uuid().v4();
@@ -160,6 +169,8 @@ class ChatRepository {
         createdAt: DateTime.now(),
         isMine: false,
       );
+
+      messagesListController.add(responseMessage);
 
       // Save Message to Firebase
       await _firestore
