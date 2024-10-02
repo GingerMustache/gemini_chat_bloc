@@ -21,7 +21,6 @@ class AuthProviderGoogle implements AuthProvider {
   }
 
   @override
-  @override
   AuthUser? get currentUser {
     final user = _firebaseAuth.currentUser;
     if (user != null) {

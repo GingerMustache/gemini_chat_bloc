@@ -29,7 +29,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     on<EmailAndPasswordSignUpEvent>(_onEmailAndPasswordSignUpEvent);
     on<MakeGoogleAuthEvent>(_onMakeGoogleAuthEvent);
 
-    _firebaseAuthService.currentUser?.userInstance?.reload();
+    _firebaseAuthService.currentUser?.fbUserInstance?.reload();
     _userSubscription = userStream.listen(
       (User? user) {
         if (user != null && user.emailVerified) {
@@ -73,7 +73,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
 
       userRefresh = Timer.periodic(
         const Duration(seconds: 7),
-        (timer) => _firebaseAuthService.currentUser?.userInstance?.reload(),
+        (timer) => _firebaseAuthService.currentUser?.fbUserInstance?.reload(),
       );
     } on EmailAlreadyInUseAuthExceptions catch (e) {
       //TODO errors need to add to logger or add to analitics

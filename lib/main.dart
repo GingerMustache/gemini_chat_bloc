@@ -10,6 +10,7 @@ import 'package:gemini_chat_bloc/common/constants/constants.dart';
 // need to run dart run build_runner build
 import 'package:gemini_chat_bloc/common/localization/i18n/strings.g.dart';
 import 'package:gemini_chat_bloc/common/services/di_container/di_container.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'firebase_options.dart';
 
@@ -35,6 +36,11 @@ Future<void> initApp() async {
     androidProvider: AndroidProvider.debug,
   );
   await dotenv.load(fileName: '.env');
+
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_KEY'] ?? '',
+  );
 
   Bloc.observer = const AppBlocObserver();
 }
