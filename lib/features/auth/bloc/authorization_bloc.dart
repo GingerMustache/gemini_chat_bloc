@@ -11,23 +11,21 @@ part 'authorization_event.dart';
 part 'authorization_state.dart';
 
 class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
-  final AuthService _googleAuthService;
   final AuthService _firebaseAuthService;
+
   late final StreamSubscription _userSubscription;
 
   Timer? userRefresh;
 
   AuthorizationBloc({
-    required AuthService googleAuthService,
     required AuthService firebaseAuthService,
-  })  : _googleAuthService = googleAuthService,
-        _firebaseAuthService = firebaseAuthService,
+  })  : _firebaseAuthService = firebaseAuthService,
         super(
           AuthorizationInitial(),
         ) {
     on<EmailVerificationSuccessEvent>(_onEmailVerificationSuccessEvent);
     on<EmailAndPasswordSignUpEvent>(_onEmailAndPasswordSignUpEvent);
-    on<MakeGoogleAuthEvent>(_onMakeGoogleAuthEvent);
+    on<MakeGoogleLoginEvent>(_onMakeGoogleLoginEvent);
 
     _firebaseAuthService.currentUser?.fbUserInstance?.reload();
     _userSubscription = userStream.listen(
@@ -40,13 +38,13 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     );
   }
 
-  void _onMakeGoogleAuthEvent(
-    MakeGoogleAuthEvent event,
+  void _onMakeGoogleLoginEvent(
+    MakeGoogleLoginEvent event,
     Emitter<AuthorizationState> emit,
   ) async {
     try {
       emit(AuthorizationLoading());
-      await _googleAuthService.logIn(email: '', password: 'password');
+      await _firebaseAuthService.loginWithGoogle();
       emit(GotSignUpState(text: 'google auth is done'));
     } catch (e) {
       print(e.toString());

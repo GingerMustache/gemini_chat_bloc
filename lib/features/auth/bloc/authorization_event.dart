@@ -3,7 +3,7 @@ part of 'authorization_bloc.dart';
 @immutable
 sealed class AuthorizationEvent extends Equatable {}
 
-class MakeGoogleAuthEvent extends AuthorizationEvent {
+class MakeGoogleLoginEvent extends AuthorizationEvent {
   @override
   List<Object?> get props => [];
 }

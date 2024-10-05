@@ -5,7 +5,7 @@ import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_provider.d
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
-class SupaBaseAuthProvider implements AuthProvider {
+class SupabaseAuthProvider implements AuthProvider {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final supabase = sb.Supabase.instance.client;
 
@@ -47,7 +47,7 @@ class SupaBaseAuthProvider implements AuthProvider {
   AuthUser? get currentUser {
     final user = supabase.auth.currentUser;
     if (user != null) {
-      return AuthUser.fromFirebase(user);
+      return AuthUser.fromSupaBase(user);
     } else {
       return null;
     }
@@ -98,5 +98,11 @@ class SupaBaseAuthProvider implements AuthProvider {
     } else {
       throw UserNotLoggedInAuthExceptions();
     }
+  }
+
+  @override
+  Future<AuthUser> loginWithGoogle() {
+    // TODO: implement loginWithGoogle
+    throw UnimplementedError();
   }
 }

@@ -159,7 +159,7 @@ class Body extends StatelessWidget {
       height: 50,
       child: TextButton(
         onPressed: () =>
-            context.read<AuthorizationBloc>().add(MakeGoogleAuthEvent()),
+            context.read<AuthorizationBloc>().add(MakeGoogleLoginEvent()),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

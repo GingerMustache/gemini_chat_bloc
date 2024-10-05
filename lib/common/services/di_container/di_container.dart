@@ -15,7 +15,8 @@ class DiContainer implements DiContainerProvider {
       MainNavigation(screenFactory: _makeScreenFactory());
 
   ApiClient makeApiClient() => ApiClient();
-  AuthService makeGoogleAuthService() => AuthService.google();
+  // AuthService makeGoogleAuthService() => AuthService.google();
+  // AuthService makeSupabaseAuthService() => AuthService.supabase();
   AuthService makeFirebaseAuthService() => AuthService.firebase();
 
   @override

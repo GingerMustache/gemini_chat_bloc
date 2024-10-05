@@ -1,14 +1,13 @@
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_provider.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_user.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/firebase_auth_provider.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/google_auth_repository.dart';
 
 class AuthService implements AuthProvider {
   final AuthProvider provider;
   AuthService(this.provider);
 
   factory AuthService.firebase() => AuthService(FirebaseAuthProvider());
-  factory AuthService.google() => AuthService(AuthProviderGoogle());
+  // factory AuthService.supabase() => AuthService(SupabaseAuthProvider());
 
   @override
   Future<AuthUser> createUser({
@@ -33,6 +32,6 @@ class AuthService implements AuthProvider {
   @override
   Future<void> sendEmailVerification() => provider.sendEmailVerification();
 
-  // @override
-  // Future<void> initialize() => provider.initialize();
+  @override
+  Future<AuthUser> loginWithGoogle() => provider.loginWithGoogle();
 }

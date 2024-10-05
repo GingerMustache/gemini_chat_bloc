@@ -1,11 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, FirebaseAuthException;
+    show FirebaseAuth, FirebaseAuthException, GoogleAuthProvider;
+import 'package:flutter/material.dart' show immutable;
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_exceptions.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_provider.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_user.dart';
+import 'package:gemini_chat_bloc/features/auth/repositories/google_auth_repository.dart';
+import 'package:google_sign_in/google_sign_in.dart' show GoogleSignIn;
 
+@immutable
 class FirebaseAuthProvider implements AuthProvider {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static const String userNotLoggedIn = 'user-not-logged-in';
 
   @override
   Future<AuthUser> createUser({
@@ -21,20 +27,22 @@ class FirebaseAuthProvider implements AuthProvider {
       if (user != null) {
         return user;
       } else {
-        throw UserNotLoggedInAuthExceptions();
+        throw firebaseExceptionReturner(userNotLoggedIn);
+        // throw UserNotLoggedInAuthExceptions();
       }
     } on FirebaseAuthException catch (error) {
-      if (error.code == "weak-password") {
-        throw WeakPasswordAuthExceptions();
-      } else if (error.code == "email-already-in-use") {
-        throw EmailAlreadyInUseAuthExceptions();
-      } else if (error.code == "invalid-email") {
-        throw InvalidEmailAuthExceptions();
-      } else {
-        throw GenericAuthExceptions();
-      }
+      throw firebaseExceptionReturner(error.code);
+      // if (error.code == "weak-password") {
+      //   throw WeakPasswordAuthExceptions();
+      // } else if (error.code == "email-already-in-use") {
+      //   throw EmailAlreadyInUseAuthExceptions();
+      // } else if (error.code == "invalid-email") {
+      //   throw InvalidEmailAuthExceptions();
+      // } else {
+      //   throw GenericAuthExceptions();
+      // }
     } catch (_) {
-      throw GenericAuthExceptions();
+      throw firebaseExceptionReturner(null);
     }
   }
 
@@ -60,18 +68,21 @@ class FirebaseAuthProvider implements AuthProvider {
       if (user != null) {
         return user;
       } else {
-        throw UserNotLoggedInAuthExceptions();
+        throw firebaseExceptionReturner(userNotLoggedIn);
+        // throw UserNotLoggedInAuthExceptions();
       }
     } on FirebaseAuthException catch (error) {
-      if (error.code == "user-not-found") {
-        throw UserNotFoundAuthExceptions();
-      } else if (error.code == "wrong-password") {
-        throw WrongPasswordAuthExceptions();
-      } else {
-        throw GenericAuthExceptions();
-      }
+      throw firebaseExceptionReturner(error.code);
+      // if (error.code == "user-not-found") {
+      //   throw UserNotFoundAuthExceptions();
+      // } else if (error.code == "wrong-password") {
+      //   throw WrongPasswordAuthExceptions();
+      // } else {
+      //   throw GenericAuthExceptions();
+      // }
     } catch (_) {
-      throw GenericAuthExceptions();
+      throw firebaseExceptionReturner(null);
+      // throw GenericAuthExceptions();
     }
   }
 
@@ -80,8 +91,10 @@ class FirebaseAuthProvider implements AuthProvider {
     final user = _firebaseAuth.currentUser;
     if (user != null) {
       await _firebaseAuth.signOut();
+      await _googleSignIn.signOut();
     } else {
-      throw UserNotLoggedInAuthExceptions();
+      throw firebaseExceptionReturner(userNotLoggedIn);
+      // throw UserNotLoggedInAuthExceptions();
     }
   }
 
@@ -91,14 +104,27 @@ class FirebaseAuthProvider implements AuthProvider {
     if (user != null) {
       await user.sendEmailVerification();
     } else {
-      throw UserNotLoggedInAuthExceptions();
+      throw firebaseExceptionReturner(userNotLoggedIn);
+      // throw UserNotLoggedInAuthExceptions();
     }
   }
 
-  // @override
-  // Future<void> initialize() async {
-  //   await Firebase.initializeApp(
-  //     options: DefaultFirebaseOptions.currentPlatform,
-  //   );
-  // }
+  @override
+  Future<AuthUser> loginWithGoogle() async {
+    final googleUser = await _googleSignIn.signIn();
+
+    // if (googleUser == null)
+    //  return null;
+    //TODO need to make error implementation, google user is null
+
+    final googleAuth = await googleUser?.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    await _firebaseAuth.signInWithCredential(credential);
+
+    return AuthUser(email: googleUser?.email, isEmailVerified: true);
+  }
 }
