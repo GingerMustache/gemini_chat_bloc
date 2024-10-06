@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart' show immutable;
 import 'package:gemini_chat_bloc/common/extensions/image_mim_type.dart';
 import 'package:gemini_chat_bloc/features/auth/data/models/message.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/storage_repository.dart';
+import 'package:gemini_chat_bloc/features/first/repository/storage_repository.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';

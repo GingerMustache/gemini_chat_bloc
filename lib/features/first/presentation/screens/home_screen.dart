@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/chat_repository.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/storage_repository.dart';
+import 'package:gemini_chat_bloc/features/first/repository/chat_repository.dart';
+import 'package:gemini_chat_bloc/features/first/repository/storage_repository.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class HomeScreen extends StatefulWidget {

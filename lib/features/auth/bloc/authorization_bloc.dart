@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User, FirebaseAuth;
-import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_exceptions.dart';
+import 'package:gemini_chat_bloc/common/constants/constants.dart';
+import 'package:gemini_chat_bloc/common/exceptions/firebase_exceptions.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_service.dart';
 import 'package:meta/meta.dart';
 
@@ -12,9 +13,7 @@ part 'authorization_state.dart';
 
 class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   final AuthService _firebaseAuthService;
-
   late final StreamSubscription _userSubscription;
-
   Timer? userRefresh;
 
   AuthorizationBloc({
@@ -73,16 +72,10 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
         const Duration(seconds: 7),
         (timer) => _firebaseAuthService.currentUser?.fbUserInstance?.reload(),
       );
-    } on EmailAlreadyInUseAuthExceptions catch (e) {
-      //TODO errors need to add to logger or add to analitics
-      emit(ErrorState(text: 'email already in use'));
-    } on InvalidEmailAuthExceptions catch (e) {
-      emit(ErrorState(text: 'invalid email'));
-    } on WeakPasswordAuthExceptions catch (e) {
-      emit(ErrorState(text: 'weak password'));
-    } on GenericAuthExceptions catch (e) {
-      emit(ErrorState(
-          text: 'something went wrong, try later, or do your job body'));
+    } on FirebaseException catch (error) {
+      emit(ErrorState(text: exceptionTextReturner[error] ?? ''));
+      talker.error(error.toString());
+      //   //TODO need to add analitics
     }
   }
 

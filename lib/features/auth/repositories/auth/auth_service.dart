@@ -1,6 +1,6 @@
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_provider.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_user.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/auth/firebase_auth_provider.dart';
+import 'package:gemini_chat_bloc/features/auth/repositories/auth/providers/firebase_auth_provider.dart';
 
 class AuthService implements AuthProvider {
   final AuthProvider provider;

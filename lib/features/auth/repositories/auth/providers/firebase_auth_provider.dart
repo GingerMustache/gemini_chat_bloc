@@ -1,10 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException, GoogleAuthProvider;
 import 'package:flutter/material.dart' show immutable;
-import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_exceptions.dart';
+import 'package:gemini_chat_bloc/common/exceptions/firebase_exceptions.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_provider.dart';
 import 'package:gemini_chat_bloc/features/auth/repositories/auth/auth_user.dart';
-import 'package:gemini_chat_bloc/features/auth/repositories/google_auth_repository.dart';
 import 'package:google_sign_in/google_sign_in.dart' show GoogleSignIn;
 
 @immutable
@@ -28,19 +27,9 @@ class FirebaseAuthProvider implements AuthProvider {
         return user;
       } else {
         throw firebaseExceptionReturner(userNotLoggedIn);
-        // throw UserNotLoggedInAuthExceptions();
       }
     } on FirebaseAuthException catch (error) {
       throw firebaseExceptionReturner(error.code);
-      // if (error.code == "weak-password") {
-      //   throw WeakPasswordAuthExceptions();
-      // } else if (error.code == "email-already-in-use") {
-      //   throw EmailAlreadyInUseAuthExceptions();
-      // } else if (error.code == "invalid-email") {
-      //   throw InvalidEmailAuthExceptions();
-      // } else {
-      //   throw GenericAuthExceptions();
-      // }
     } catch (_) {
       throw firebaseExceptionReturner(null);
     }
@@ -69,20 +58,11 @@ class FirebaseAuthProvider implements AuthProvider {
         return user;
       } else {
         throw firebaseExceptionReturner(userNotLoggedIn);
-        // throw UserNotLoggedInAuthExceptions();
       }
     } on FirebaseAuthException catch (error) {
       throw firebaseExceptionReturner(error.code);
-      // if (error.code == "user-not-found") {
-      //   throw UserNotFoundAuthExceptions();
-      // } else if (error.code == "wrong-password") {
-      //   throw WrongPasswordAuthExceptions();
-      // } else {
-      //   throw GenericAuthExceptions();
-      // }
     } catch (_) {
       throw firebaseExceptionReturner(null);
-      // throw GenericAuthExceptions();
     }
   }
 
@@ -94,7 +74,6 @@ class FirebaseAuthProvider implements AuthProvider {
       await _googleSignIn.signOut();
     } else {
       throw firebaseExceptionReturner(userNotLoggedIn);
-      // throw UserNotLoggedInAuthExceptions();
     }
   }
 
@@ -105,7 +84,6 @@ class FirebaseAuthProvider implements AuthProvider {
       await user.sendEmailVerification();
     } else {
       throw firebaseExceptionReturner(userNotLoggedIn);
-      // throw UserNotLoggedInAuthExceptions();
     }
   }
 

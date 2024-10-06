@@ -4,9 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemini_chat_bloc/common/application/app_settings.dart';
 import 'package:gemini_chat_bloc/common/constants/constants.dart';
-import 'package:gemini_chat_bloc/common/routing/routes.dart';
 import 'package:gemini_chat_bloc/features/auth/bloc/authorization_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 part '../parts/auth_input_field.dart';
 
@@ -111,7 +109,7 @@ class Body extends StatelessWidget {
             child: BlocConsumer<AuthorizationBloc, AuthorizationState>(
               listenWhen: (previous, current) => current is GotSignUpState,
               listener: (context, state) {
-                context.goNamed(mainRoutesName(MainRoutes.home));
+                // context.goNamed(mainRoutesName(MainRoutes.home));
               },
               builder: (context, state) {
                 if (state is AuthorizationLoading) {
